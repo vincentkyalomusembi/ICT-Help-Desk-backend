@@ -19,14 +19,9 @@
    pip install -r requirements.txt
 ```
 
-4. Create your `.env` file — ask the backend lead for the credentials
+4. Create your `.env` file and ask the team lead / backend lead for the credentials
 
-5. Run migrations
-```bash
-   alembic upgrade head
-```
-
-6. Start the server
+5. Start the server
 ```bash
    fastapi dev app/main.py
 ```
@@ -51,17 +46,12 @@
    pip install -r requirements.txt
 ```
 
-4. Run migrations — only applies if someone added a new table or column. Safe to always run, it skips if nothing is new.
-```bash
-   alembic upgrade head
-```
-
-5. Switch to your branch and do your work
+4. Switch to your branch and do your work
 ```bash
    git checkout your-branch-name
 ```
 
-6. Once done, push and raise a PR for review
+5. Once done, push and raise a PR for review
 ```bash
    git add .
    git commit -m "your message"
