@@ -46,12 +46,14 @@
    pip install -r requirements.txt
 ```
 
-4. Switch to your branch and do your work
+4. Switch to your branch and merge main into it
 ```bash
    git checkout your-branch-name
+   git merge main
+   git push
 ```
 
-5. Once done, push and raise a PR for review
+5. Do your work, then push and raise a PR for review
 ```bash
    git add .
    git commit -m "your message"
