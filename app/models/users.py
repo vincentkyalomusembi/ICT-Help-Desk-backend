@@ -25,14 +25,13 @@ class User(SQLModel, table=True):
     last_name: str = Field(max_length=50)
     directorate_id: int = Field(foreign_key="directorates.id")
     department_id: int = Field(foreign_key="departments.id")
-    office_number:str = Field(default=None, nullable=False)
-    office_location: str = Field(default=None, nullable=False)
+    office_number:str = Field(nullable=False)
+    office_location: str = Field(nullable=False)
     role: UserRole = Field(default=UserRole.staff)
     failed_attempts: int = Field(default=0)
     is_activated: bool = Field(default=False)
     is_active: bool = Field(default=True)
     banned_until: Optional[datetime] = Field(
-        default=None,
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )
     directorate: Optional["Directorate"] = Relationship(back_populates="users") 
