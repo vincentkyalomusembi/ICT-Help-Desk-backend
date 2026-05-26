@@ -1,0 +1,39 @@
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column
+import enum
+import uuid
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
+from typing import Optional, TYPE_CHECKING
+from datetime import datetime
+
+if TYPE_CHECKING:
+    from .directorate import Directorate
+    from .department import Department
+
+class UserRole(str, enum.Enum):
+    admin = "ADMIN"
+    staff = "STAFF"
+    technician = "TECHNICIAN"
+
+class User(SQLModel, table=True):
+    __tablename__ = "staff"
+    auth_user_id: uuid.UUID = Field(
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, nullable=False)
+    )
+    personal_no: str = Field(index=True, unique=True)
+    first_name: str = Field(max_length=50)
+    last_name: str = Field(max_length=50)
+    directorate_id: int = Field(foreign_key="directorates.id")
+    department_id: int = Field(foreign_key="departments.id")
+    office_number:str = Field(default=None, nullable=False)
+    office_location: str = Field(default=None, nullable=False)
+    role: UserRole = Field(default=UserRole.staff)
+    failed_attempts: int = Field(default=0)
+    is_activated: bool = Field(default=False)
+    is_active: bool = Field(default=True)
+    banned_until: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
+    )
+    directorate: Optional["Directorate"] = Relationship(back_populates="users") 
+    department: Optional["Department"] = Relationship(back_populates="users")      
