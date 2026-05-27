@@ -29,31 +29,19 @@
 ---
 
 ### Daily Workflow
-1. Switch to main and pull latest changes
-```bash
-   git checkout main
-   git pull
-```
-
-2. Activate your virtual environment
+1. Activate your virtual environment
 ```bash
    venv\Scripts\activate  # Windows
    source venv/bin/activate  # Mac/Linux
 ```
 
-3. Install any new dependencies
-```bash
-   pip install -r requirements.txt
-```
-
-4. Switch to your branch and merge main into it
+2. Switch to your branch and pull latest changes from dev
 ```bash
    git checkout your-branch-name
-   git merge main
-   git push
+   git pull origin dev
 ```
 
-5. Do your work, then push and raise a PR for review
+3. Do your work, then push and raise a PR for review
 ```bash
    git add .
    git commit -m "your message"
@@ -62,4 +50,4 @@
 
 ---
 
-> Never push directly to main. Always work on your own branch and raise a PR.
+> Never push directly to main or dev. Always work on your own branch and raise a PR into dev.
