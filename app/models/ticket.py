@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship, func
+from sqlmodel import SQLModel, Field, Relationship, func, Enum as SAEnum
 from sqlalchemy import Column, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
