@@ -1,23 +1,21 @@
-import uuid
-from sqlalchemy.dialects.postgresql import UUID
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, func
 from sqlalchemy import Column, DateTime, ForeignKey
-from sqlalchemy import Enum as SAEnum
-from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
-from enum import Enum
+import uuid
+import enum
 
 if TYPE_CHECKING:
     from .users import User
     from .ict_personnel import IctPersonnel
 
-class TicketStatus(str, Enum):
+class TicketStatus(str, enum.Enum):
     open = "open"
     in_progress = "in_progress"
     resolved = "resolved"
 
-class TicketCategory(str, Enum):
+class TicketCategory(str, enum.Enum):
     hardware = "hardware"
     software = "software"
     network = "network"
@@ -32,7 +30,9 @@ class Ticket(SQLModel, table=True):
     staff_id: uuid.UUID = Field(
         sa_column=Column(UUID(as_uuid=True), ForeignKey("staff.auth_user_id"), nullable=False)
     )
-    assigned_to: int = Field(foreign_key="ict_personnel.id")
+    assigned_to: int = Field(
+        sa_column=Column(ForeignKey("ict_personnel.id"), nullable=False)
+    )
     title: str = Field(index=True)
     description: str = Field(nullable=False)
     category: TicketCategory = Field(
@@ -43,12 +43,12 @@ class Ticket(SQLModel, table=True):
     )
     created_at: Optional[datetime] = Field(
         default=None,
-        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
-    )
-    resolved_at: Optional[datetime] = Field(
-        default=None,
-        sa_column=Column(DateTime(timezone=True), nullable=True)
-    )
-
+        sa_column=Column(DateTime(timezone=True), server_default=func.now())
+        )
+    
+    resolved_at: datetime = Field(default=None,
+        sa_column=Column(DateTime(timezone=True), onupdate=func.now())
+        )
+    
     users: Optional["User"] = Relationship(back_populates="tickets")
     ict_personnel: Optional["IctPersonnel"] = Relationship(back_populates="tickets")

@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.models import User, UserRole
 from app.schemas import UserCreate, UserResponse
-from app.core import supabase
+from app.core import supabase as supabase_client
 
 
 class UserService:
@@ -15,7 +15,11 @@ class UserService:
         session: AsyncSession,
         payload: UserCreate
     ) -> User:
-
+        if not supabase_client:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Auth service not available"
+            )
     
         result = await session.exec(
             select(User).where(User.personal_no == payload.personal_no)
@@ -29,7 +33,7 @@ class UserService:
 
         
         try:
-            auth_response = supabase.auth.admin.create_user({
+            auth_response = supabase_client.auth.admin.create_user({
                 "email": payload.email,
                 "password": payload.password,
                 "phone": payload.phone,
@@ -61,7 +65,7 @@ class UserService:
 
         except Exception as e:
         
-            supabase.auth.admin.delete_user(auth_user.id)
+            supabase_client.auth.admin.delete_user(auth_user.id)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to save user profile: {str(e)}"
@@ -74,10 +78,14 @@ class UserService:
         email: str,
         password: str
     ) -> dict:
+        if not supabase_client:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Auth service not available"
+            )
 
-    
         try:
-            auth_response = supabase.auth.sign_in_with_password({
+            auth_response = supabase_client.auth.sign_in_with_password({
                 "email": email,
                 "password": password
             })
