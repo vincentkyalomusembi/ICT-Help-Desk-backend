@@ -10,8 +10,6 @@ if TYPE_CHECKING:
     from .users import User
     from .ict_personnel import IctPersonnel
 
-import enum
-
 class TicketStatus(str, enum.Enum):
     open = "open"
     in_progress = "in_progress"
