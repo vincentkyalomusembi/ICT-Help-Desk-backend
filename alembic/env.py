@@ -1,15 +1,39 @@
 from logging.config import fileConfig
-import asyncio
+import os
 
-from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app.core import settings
 from sqlmodel import SQLModel
-from app.models import Directorate, Department, User, IctPersonnel
+
+load_dotenv()
+
+from app.models import (
+    Directorate,
+    Department,
+    User,
+    IctPersonnel,
+    AuditLog,
+    AssetAllocation,
+    Asset,
+)
+
+from app.models import Directorate, Department, User, IctPersonnel, AuditLog
+
+load_dotenv()
+
+
+from app.models import Directorate, Department, User, IctPersonnel, AssetAllocation, Asset
+
+
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
+database_url = os.getenv("DATABASE_URL")
+if not database_url:
+    raise RuntimeError("DATABASE_URL is not set for Alembic migrations.")
+
+sync_database_url = database_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://")
+config.set_main_option("sqlalchemy.url", sync_database_url.replace("%", "%%"))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -31,24 +55,17 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    connectable = async_engine_from_config(
+    connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
-    async def do_run_migrations():
-        async with connectable.connect() as connection:
-            await connection.run_sync(
-                lambda conn: context.configure(
-                    connection=conn,
-                    target_metadata=target_metadata
-                )
-            )
-            async with connection.begin():
-                await connection.run_sync(lambda conn: context.run_migrations())
+    with connectable.connect() as connection:
+        context.configure(connection=connection, target_metadata=target_metadata)
 
-    asyncio.run(do_run_migrations())
+        with context.begin_transaction():
+            context.run_migrations()
 
 
 if context.is_offline_mode():
