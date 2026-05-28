@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from .department import Department
     from .ict_personnel import IctPersonnel
     from .ticket import Ticket
+    from .audit_logs import AuditLog
 
 class UserRole(str, enum.Enum):
     admin = "ADMIN"
@@ -40,5 +41,6 @@ class User(SQLModel, table=True):
     )
     directorate: Optional["Directorate"] = Relationship(back_populates="users") 
     department: Optional["Department"] = Relationship(back_populates="users")
-    ict_profile: Optional["IctPersonnel"] = Relationship(back_populates="staff")    
-    tickets: List["Ticket"] = Relationship(back_populates="users")  
+    audit_logs: list["AuditLog"] = Relationship(back_populates="user")
+    ict_profile: Optional["IctPersonnel"] = Relationship(back_populates="staff")
+    tickets: List["Ticket"] = Relationship(back_populates="users")
