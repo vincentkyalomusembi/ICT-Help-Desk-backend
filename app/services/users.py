@@ -40,9 +40,11 @@ class UserService:
             })
             auth_user = auth_response.user
 
-            supabase.auth.admin.generate_link({
-                "type": "magiclink",
-                "email": payload.email
+            supabase_client.auth.sign_in_with_otp({
+                "email": payload.email,
+                "options": {
+                    "should_create_user": False
+                }
             })
 
         except Exception as e:
@@ -128,3 +130,44 @@ class UserService:
             "token_type": "bearer",
             "user": user
         }
+    
+    async def activate_account(
+        self,
+        session: AsyncSession,
+        token: str
+    ) -> User:
+        
+        try:
+            response = supabase_client.auth.verify_otp(
+                token_hash=token,
+                type="magiclink"
+            )
+            auth_user = response.user
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid or expired link: {str(e)}"
+            )
+
+        if not auth_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired link"
+            )
+
+        result = await session.exec(
+            select(User).where(User.auth_user_id == UUID(auth_user.id))
+        )
+        user = result.one_or_none()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User profile not found"
+            )
+
+        user.is_activated = True
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user
