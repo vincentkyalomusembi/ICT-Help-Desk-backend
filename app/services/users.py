@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.models import User, UserRole
 from app.schemas import UserCreate, UserResponse
-from app.core import supabase as supabase_client
+from app.core.supabase import supabase as supabase_client
 
 
 class UserService:
@@ -31,22 +31,26 @@ class UserService:
                 detail="Personal number already registered"
             )
 
-        
         try:
             auth_response = supabase_client.auth.admin.create_user({
                 "email": payload.email,
                 "password": payload.password,
                 "phone": payload.phone,
-                "email_confirm": False,
-                "send_confirmation": True  
+                "email_confirm": False
             })
             auth_user = auth_response.user
+
+            supabase.auth.admin.generate_link({
+                "type": "magiclink",
+                "email": payload.email
+            })
+
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Failed to create auth user: {str(e)}"
             )
-        
+
         try:
             user = User(
                 auth_user_id=UUID(auth_user.id),
@@ -70,7 +74,6 @@ class UserService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to save user profile: {str(e)}"
             )
-        
 
     async def login(
         self,
@@ -94,7 +97,7 @@ class UserService:
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
+                detail=f"Supabase error: {str(e)}"
             )
 
         result = await session.exec(

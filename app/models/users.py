@@ -6,7 +6,6 @@ from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
 
-from app.models.ticket import Ticket
 
 if TYPE_CHECKING:
     from .directorate import Directorate
@@ -14,6 +13,7 @@ if TYPE_CHECKING:
     from .ict_personnel import IctPersonnel
     from .ticket import Ticket
     from .audit_logs import AuditLog
+    from .asset_allocation import AssetAllocation
 
 class UserRole(str, enum.Enum):
     admin = "ADMIN"
@@ -44,3 +44,4 @@ class User(SQLModel, table=True):
     audit_logs: list["AuditLog"] = Relationship(back_populates="user")
     ict_profile: Optional["IctPersonnel"] = Relationship(back_populates="staff")
     tickets: List["Ticket"] = Relationship(back_populates="users")
+    asset_allocations: List["AssetAllocation"] = Relationship(back_populates="staff")
