@@ -1,12 +1,10 @@
-from sqlmodel import SQLModel, Field, Relationship, func, Enum as SAEnum
-from sqlalchemy import Column, DateTime, ForeignKey
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 import uuid
 import enum
-from typing import Optional, TYPE_CHECKING
-from datetime import datetime
 
 if TYPE_CHECKING:
     from .users import User
@@ -48,5 +46,5 @@ class Ticket(SQLModel, table=True):
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )
 
-    staff: Optional["User"] = Relationship(back_populates="tickets")
-    assigned_to: Optional["IctPersonnel"] = Relationship(back_populates="assigned_tickets")
+    users: Optional["User"] = Relationship(back_populates="tickets")
+    assignee: Optional["IctPersonnel"] = Relationship(back_populates="assigned_tickets")
