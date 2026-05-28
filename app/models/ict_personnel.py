@@ -5,8 +5,11 @@ import uuid
 import enum
 from typing import Optional, List, TYPE_CHECKING
 
+from app.models.ticket import Ticket
+
 if TYPE_CHECKING:
     from .users import User
+    from .ticket import Ticket
     #from .ticket import Ticket
    # from .asset_allocations import AssetAllocation
 
@@ -39,5 +42,6 @@ class IctPersonnel(SQLModel, table=True):
     is_active: bool = Field(default=True)
 
     staff: Optional["User"] = Relationship(back_populates="ict_profile")
+    tickets: List["Ticket"] = Relationship(back_populates="ict_personnel")
     #assigned_tickets: List["Ticket"] = Relationship(back_populates="assigned_to")
     #allocations_processed: List["AssetAllocation"] = Relationship(back_populates="allocated_by")
