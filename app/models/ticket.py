@@ -1,8 +1,9 @@
-from sqlmodel import Enum, SQLModel, Field, Relationship,func
-from sqlalchemy import Column,Enum, DateTime
+from sqlmodel import Enum, SQLModel, Field, Relationship, func
+from sqlalchemy import Column, Enum as SQLEnum, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
-from supabase_auth import User
+import uuid
 
 if TYPE_CHECKING:
     from .users import User
@@ -27,8 +28,11 @@ class TicketCategory(str, Enum):
 class Ticket(SQLModel, table=True):
     __tablename__ = "Tickets"
     id: int = Field(primary_key=True)
-    staff_id: int = Field(foreign_key="staff.auth_user_id")
-    assigned_to: str = Field(foreign_key="ict_personnel.id")
+    staff_id: uuid.UUID = Field(
+        sa_column=Column(UUID(as_uuid=True), nullable=False),
+        foreign_key="staff.auth_user_id"
+    )
+    assigned_to: int = Field(nullable=False, foreign_key="ict_personnel.id")
     title: str = Field(index=True)
     description: str = Field(nullable=False)
     category: TicketCategory = Field(nullable=False)
@@ -42,5 +46,5 @@ class Ticket(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), onupdate=func.now())
         )
     
-    users: Optional[User] = Relationship(back_populates="tickets")
+    users: Optional["User"] = Relationship(back_populates="tickets")
     ict_personnel: Optional["IctPersonnel"] = Relationship(back_populates="tickets")
