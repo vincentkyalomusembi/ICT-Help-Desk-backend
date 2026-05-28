@@ -65,3 +65,54 @@ class UserService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to save user profile: {str(e)}"
             )
+        
+
+    async def login(
+        self,
+        session: AsyncSession,
+        email: str,
+        password: str
+    ) -> dict:
+
+    
+        try:
+            auth_response = supabase.auth.sign_in_with_password({
+                "email": email,
+                "password": password
+            })
+            auth_user = auth_response.user
+            access_token = auth_response.session.access_token
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+
+        result = await session.exec(
+            select(User).where(User.auth_user_id == UUID(auth_user.id))
+        )
+        user = result.one_or_none()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User profile not found"
+            )
+
+        if not user.is_activated:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account not activated. Check your email for the magic link."
+            )
+
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account deactivated. Contact admin."
+            )
+
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": user
+        }
