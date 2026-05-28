@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from app.core import settings
 from sqlmodel import SQLModel
-from app.models import Directorate, Department, User, IctPersonnel
+from app.models import Directorate, Department, User, IctPersonnel, AssetAllocation, Asset
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 
