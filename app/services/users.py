@@ -33,7 +33,8 @@ class UserService:
                 "email": payload.email,
                 "password": payload.password,
                 "phone": payload.phone,
-                "email_confirm": False  
+                "email_confirm": False,
+                "send_confirmation": True  
             })
             auth_user = auth_response.user
         except Exception as e:
