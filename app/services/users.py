@@ -16,7 +16,6 @@ class UserService:
         payload: UserCreate
     ) -> User:
 
-    
         result = await session.exec(
             select(User).where(User.personal_no == payload.personal_no)
         )
@@ -27,22 +26,26 @@ class UserService:
                 detail="Personal number already registered"
             )
 
-        
         try:
             auth_response = supabase.auth.admin.create_user({
                 "email": payload.email,
                 "password": payload.password,
                 "phone": payload.phone,
-                "email_confirm": False,
-                "send_confirmation": True  
+                "email_confirm": False
             })
             auth_user = auth_response.user
+
+            supabase.auth.admin.generate_link({
+                "type": "magiclink",
+                "email": payload.email
+            })
+
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Failed to create auth user: {str(e)}"
             )
-        
+
         try:
             user = User(
                 auth_user_id=UUID(auth_user.id),
@@ -60,13 +63,11 @@ class UserService:
             return user
 
         except Exception as e:
-        
             supabase.auth.admin.delete_user(auth_user.id)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to save user profile: {str(e)}"
             )
-        
 
     async def login(
         self,
@@ -75,7 +76,6 @@ class UserService:
         password: str
     ) -> dict:
 
-    
         try:
             auth_response = supabase.auth.sign_in_with_password({
                 "email": email,
