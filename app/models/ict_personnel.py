@@ -43,5 +43,5 @@ class IctPersonnel(SQLModel, table=True):
 
     staff: Optional["User"] = Relationship(back_populates="ict_profile")
     tickets: List["Ticket"] = Relationship(back_populates="ict_personnel")
-    #assigned_tickets: List["Ticket"] = Relationship(back_populates="assigned_to")
+    assigned_tickets: List["Ticket"] = Relationship(back_populates="assigned_to")
     #allocations_processed: List["AssetAllocation"] = Relationship(back_populates="allocated_by")
