@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.models import User, UserRole
 from app.schemas import UserCreate, UserResponse
-from app.core import supabase as supabase_client
+from app.core.supabase import supabase as supabase_client
 
 
 class UserService:
@@ -97,7 +97,7 @@ class UserService:
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
+                detail=f"Supabase error: {str(e)}"
             )
 
         result = await session.exec(
