@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import enum
@@ -31,7 +31,7 @@ class IctPersonnel(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     staff_id: uuid.UUID = Field(
-        sa_column=Column(UUID(as_uuid=True), unique=True, nullable=False)
+    sa_column=Column(UUID(as_uuid=True), ForeignKey("staff.auth_user_id"), unique=True, nullable=False)
     )
     specialization: Specialization = Field(default=Specialization.hardware)
     availability: Availability = Field(default=Availability.available)
