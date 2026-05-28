@@ -17,10 +17,8 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     auth_user_id: UUID
     personal_no: str
-    email: EmailStr
     first_name: str
     last_name: str 
-    phone: str
     directorate_id: int 
     department_id: int 
     office_number:str 
@@ -39,3 +37,15 @@ class UserUpdate(BaseModel):
     department_id: int | None = None
     office_number:str | None = None
     office_location: str | None = None
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse
+
+    model_config = ConfigDict(from_attributes=True)
