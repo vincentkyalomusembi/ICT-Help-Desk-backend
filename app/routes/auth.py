@@ -24,3 +24,10 @@ async def login(
     session: AsyncSession = Depends(get_session)
 ):
     return await user_service.login(session, payload.email, payload.password)
+
+@router.post("/verify", response_model=UserResponse)
+async def verify_account(
+    token: str,
+    session: AsyncSession = Depends(get_session)
+):
+    return await user_service.activate_account(session, token)
