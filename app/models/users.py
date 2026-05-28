@@ -9,6 +9,7 @@ from datetime import datetime
 if TYPE_CHECKING:
     from .directorate import Directorate
     from .department import Department
+    from .ict_personnel import IctPersonnel
 
 class UserRole(str, enum.Enum):
     admin = "ADMIN"
@@ -35,4 +36,5 @@ class User(SQLModel, table=True):
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )
     directorate: Optional["Directorate"] = Relationship(back_populates="users") 
-    department: Optional["Department"] = Relationship(back_populates="users")      
+    department: Optional["Department"] = Relationship(back_populates="users")
+    ict_profile: Optional["IctPersonnel"] = Relationship(back_populates="staff")      
