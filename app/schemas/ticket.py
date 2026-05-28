@@ -14,7 +14,7 @@ class TicketUpdate(BaseModel):
     description: Optional[str] = None
     category: Optional[TicketCategory] = None
     status: Optional[TicketStatus] = None
-    assigned_to_id: Optional[str] = None
+    assigned_to: Optional[int] = None
     resolved_at: Optional[datetime] = None
 
 class TicketResponse(BaseModel):

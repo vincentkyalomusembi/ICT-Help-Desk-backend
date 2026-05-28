@@ -3,16 +3,20 @@ import os
 
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
-
 from alembic import context
 from sqlmodel import SQLModel
 
-from app.models import Directorate, Department, User, IctPersonnel, AuditLog
-
 load_dotenv()
 
-
-from app.models import Directorate, Department, User, IctPersonnel, AssetAllocation, Asset
+from app.models import (
+    Directorate,
+    Department,
+    User,
+    IctPersonnel,
+    AuditLog,
+    AssetAllocation,
+    Asset,
+)
 
 config = context.config
 database_url = os.getenv("DATABASE_URL")
