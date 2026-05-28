@@ -17,10 +17,8 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     auth_user_id: UUID
     personal_no: str
-    email: EmailStr
     first_name: str
     last_name: str 
-    phone: str
     directorate_id: int 
     department_id: int 
     office_number:str 
