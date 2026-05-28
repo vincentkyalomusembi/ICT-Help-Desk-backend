@@ -1,4 +1,4 @@
 from .users import UserService
 from .audit_service import AuditService
-
-__all__ = ["UserService", "AuditService"]
+from .directorate import DirectorateService
+__all__ = ["UserService", "AuditService", "DirectorateService"]
