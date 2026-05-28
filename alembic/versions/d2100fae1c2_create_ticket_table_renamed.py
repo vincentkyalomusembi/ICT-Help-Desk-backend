@@ -1,6 +1,6 @@
 """create ticket table
 
-Revision ID: b2000daaf0f8
+Revision ID: d2100fae1c2
 Revises: 54fd007a10c1
 Create Date: 2026-05-28 14:24:12.194052
 
@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 import sqlmodel
 
 # revision identifiers, used by Alembic.
-revision: str = 'b2000daaf0f8'
+revision: str = 'd2100fae1c2'
 down_revision: Union[str, Sequence[str], None] = '54fd007a10c1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
