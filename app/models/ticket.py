@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship, func, Enum as SAEnum
 from sqlalchemy import Column, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 import uuid
