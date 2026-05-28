@@ -1,21 +1,24 @@
-from sqlmodel import Enum, SQLModel, Field, Relationship, func
-from sqlalchemy import Column, Enum as SQLEnum, DateTime
+from sqlmodel import SQLModel, Field, Relationship, func
+from sqlalchemy import Column, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 import uuid
+import enum
 
 if TYPE_CHECKING:
     from .users import User
     from .ict_personnel import IctPersonnel
 
-class TicketStatus(str, Enum):
+import enum
+
+class TicketStatus(str, enum.Enum):
     open = "open"
     in_progress = "in_progress"
     resolved = "resolved"
     closed = "closed"
 
-class TicketCategory(str, Enum):
+class TicketCategory(str, enum.Enum):
     hardware = "hardware"
     software = "software"
     network = "network"
@@ -29,10 +32,11 @@ class Ticket(SQLModel, table=True):
     __tablename__ = "Tickets"
     id: int = Field(primary_key=True)
     staff_id: uuid.UUID = Field(
-        sa_column=Column(UUID(as_uuid=True), nullable=False),
-        foreign_key="staff.auth_user_id"
+        sa_column=Column(UUID(as_uuid=True), ForeignKey("staff.auth_user_id"), nullable=False)
     )
-    assigned_to: int = Field(nullable=False, foreign_key="ict_personnel.id")
+    assigned_to: int = Field(
+        sa_column=Column(ForeignKey("ict_personnel.id"), nullable=False)
+    )
     title: str = Field(index=True)
     description: str = Field(nullable=False)
     category: TicketCategory = Field(nullable=False)
