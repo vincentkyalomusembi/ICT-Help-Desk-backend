@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.db.database import check_db_connection
+from app.routes import auth_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -9,6 +10,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.get("/")
-async def home():
-    return {"message": "Hello, World!"}
+app.include_router(auth_router)
