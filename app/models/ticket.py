@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship, func
-from sqlalchemy import Column, DateTime, ForeignKey
+from sqlalchemy import Column, ForeignKey, Enum as SAEnum
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
@@ -24,13 +24,13 @@ class TicketCategory(str, enum.Enum):
     other = "other"
 
 class Ticket(SQLModel, table=True):
-    __tablename__ = "Tickets"
+    __tablename__ = "Tickets"  # type: ignore[assignment]
 
     id: int = Field(primary_key=True)
     staff_id: uuid.UUID = Field(
         sa_column=Column(UUID(as_uuid=True), ForeignKey("staff.auth_user_id"), nullable=False)
     )
-    assigned_to: int = Field(
+    assigned_to_id: int = Field(
         sa_column=Column(ForeignKey("ict_personnel.id"), nullable=False)
     )
     title: str = Field(index=True)
@@ -43,12 +43,14 @@ class Ticket(SQLModel, table=True):
     )
     created_at: Optional[datetime] = Field(
         default=None,
-        sa_column=Column(DateTime(timezone=True), server_default=func.now())
-        )
-    
-    resolved_at: datetime = Field(default=None,
-        sa_column=Column(DateTime(timezone=True), onupdate=func.now())
-        )
+        sa_column=Column(TIMESTAMP(timezone=True), server_default=func.now()),
+    )
+
+    resolved_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(TIMESTAMP(timezone=True), onupdate=func.now()),
+    )
     
     users: Optional["User"] = Relationship(back_populates="tickets")
     ict_personnel: Optional["IctPersonnel"] = Relationship(back_populates="tickets")
+    assigned_to: Optional["IctPersonnel"] = Relationship(back_populates="assigned_tickets")
