@@ -7,14 +7,14 @@ class TicketCreate(BaseModel):
     title: str
     description: str
     category: TicketCategory
-    assigned_to: str
+    assigned_to_id: int
 
 class TicketUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     category: Optional[TicketCategory] = None
     status: Optional[TicketStatus] = None
-    assigned_to: Optional[int] = None
+    assigned_to_id: Optional[int] = None
     resolved_at: Optional[datetime] = None
 
 class TicketResponse(BaseModel):
@@ -22,7 +22,7 @@ class TicketResponse(BaseModel):
 
     id: int
     staff_id: int
-    assigned_to: str
+    assigned_to_id: int
     title: str
     description: str
     category: TicketCategory
