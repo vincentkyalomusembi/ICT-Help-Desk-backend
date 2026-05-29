@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.models import User, UserRole
 from app.schemas import UserCreate, UserResponse
-from app.core.supabase import supabase as supabase_client
+from app.core.supabase import get_auth_supabase_client, get_admin_supabase_client
 
 
 class UserService:
@@ -15,10 +15,11 @@ class UserService:
         session: AsyncSession,
         payload: UserCreate
     ) -> User:
+        supabase_client = get_admin_supabase_client()
         if not supabase_client:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Auth service not available"
+                detail="Admin auth service not available. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
             )
     
         result = await session.exec(
@@ -40,7 +41,7 @@ class UserService:
             })
             auth_user = auth_response.user
 
-            supabase.auth.admin.generate_link({
+            supabase_client.auth.admin.generate_link({
                 "type": "magiclink",
                 "email": payload.email
             })
@@ -81,10 +82,11 @@ class UserService:
         email: str,
         password: str
     ) -> dict:
+        supabase_client = get_auth_supabase_client()
         if not supabase_client:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Auth service not available"
+                detail="Auth service not available. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY)."
             )
 
         try:

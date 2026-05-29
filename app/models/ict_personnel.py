@@ -5,8 +5,6 @@ import uuid
 import enum
 from typing import Optional, List, TYPE_CHECKING
 
-from app.models.ticket import Ticket
-
 if TYPE_CHECKING:
     from .users import User
     from .ticket import Ticket
