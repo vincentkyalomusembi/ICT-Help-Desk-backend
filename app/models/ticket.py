@@ -24,7 +24,7 @@ class TicketCategory(str, enum.Enum):
     other = "other"
 
 class Ticket(SQLModel, table=True):
-    __tablename__ = "Tickets"  # type: ignore[assignment]
+    __tablename__ = "Tickets"  
 
     id: int = Field(primary_key=True)
     staff_id: uuid.UUID = Field(
@@ -50,7 +50,6 @@ class Ticket(SQLModel, table=True):
         default=None,
         sa_column=Column(TIMESTAMP(timezone=True), onupdate=func.now()),
     )
-    
-    users: Optional["User"] = Relationship(back_populates="tickets")
-    ict_personnel: Optional["IctPersonnel"] = Relationship(back_populates="tickets")
+
+    staff: Optional["User"] = Relationship(back_populates="tickets")
     assigned_to: Optional["IctPersonnel"] = Relationship(back_populates="assigned_tickets")
