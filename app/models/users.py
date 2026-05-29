@@ -43,5 +43,5 @@ class User(SQLModel, table=True):
     department: Optional["Department"] = Relationship(back_populates="users")
     audit_logs: list["AuditLog"] = Relationship(back_populates="user")
     ict_profile: Optional["IctPersonnel"] = Relationship(back_populates="staff")
-    tickets: List["Ticket"] = Relationship(back_populates="users")
+    tickets: List["Ticket"] = Relationship(back_populates="staff")
     asset_allocations: List["AssetAllocation"] = Relationship(back_populates="staff")

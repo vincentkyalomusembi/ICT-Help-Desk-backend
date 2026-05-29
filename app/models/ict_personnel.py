@@ -5,13 +5,9 @@ import uuid
 import enum
 from typing import Optional, List, TYPE_CHECKING
 
-from app.models.ticket import Ticket
-
 if TYPE_CHECKING:
     from .users import User
     from .ticket import Ticket
-    #from .ticket import Ticket
-   # from .asset_allocations import AssetAllocation
 
 
 class Specialization(str, enum.Enum):
@@ -19,7 +15,6 @@ class Specialization(str, enum.Enum):
     networking = "NETWORKING"
     software_and_systems = "SOFTWARE_AND_SYSTEMS"
     security = "SECURITY"
-    #other = "OTHER"
 
 
 class Availability(str, enum.Enum):
@@ -34,7 +29,7 @@ class IctPersonnel(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     staff_id: uuid.UUID = Field(
-    sa_column=Column(UUID(as_uuid=True), ForeignKey("staff.auth_user_id"), unique=True, nullable=False)
+        sa_column=Column(UUID(as_uuid=True), ForeignKey("staff.auth_user_id"), unique=True, nullable=False)
     )
     specialization: Specialization = Field(default=Specialization.hardware)
     availability: Availability = Field(default=Availability.available)
@@ -42,6 +37,4 @@ class IctPersonnel(SQLModel, table=True):
     is_active: bool = Field(default=True)
 
     staff: Optional["User"] = Relationship(back_populates="ict_profile")
-    tickets: List["Ticket"] = Relationship(back_populates="ict_personnel")
-    assigned_tickets: List["Ticket"] = Relationship(back_populates="assigned_to")
-    #allocations_processed: List["AssetAllocation"] = Relationship(back_populates="allocated_by")
+    assigned_tickets: List["Ticket"] = Relationship(back_populates="assignee")

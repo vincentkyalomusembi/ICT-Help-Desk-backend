@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.models import User, UserRole
 from app.schemas import UserCreate, UserResponse
-from app.core.supabase import supabase as supabase_client
+from app.core.supabase import get_auth_supabase_client, get_admin_supabase_client
 
 
 class UserService:
@@ -15,10 +15,11 @@ class UserService:
         session: AsyncSession,
         payload: UserCreate
     ) -> User:
+        supabase_client = get_admin_supabase_client()
         if not supabase_client:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Auth service not available"
+                detail="Admin auth service not available. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
             )
     
         result = await session.exec(
@@ -40,9 +41,11 @@ class UserService:
             })
             auth_user = auth_response.user
 
-            supabase.auth.admin.generate_link({
-                "type": "magiclink",
-                "email": payload.email
+            supabase_client.auth.sign_in_with_otp({
+                "email": payload.email,
+                "options": {
+                    "should_create_user": False
+                }
             })
 
         except Exception as e:
@@ -81,10 +84,11 @@ class UserService:
         email: str,
         password: str
     ) -> dict:
+        supabase_client = get_auth_supabase_client()
         if not supabase_client:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Auth service not available"
+                detail="Auth service not available. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY)."
             )
 
         try:
@@ -128,3 +132,44 @@ class UserService:
             "token_type": "bearer",
             "user": user
         }
+    
+    async def activate_account(
+        self,
+        session: AsyncSession,
+        token: str
+    ) -> User:
+        
+        try:
+            response = supabase_client.auth.verify_otp(
+                token_hash=token,
+                type="magiclink"
+            )
+            auth_user = response.user
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid or expired link: {str(e)}"
+            )
+
+        if not auth_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired link"
+            )
+
+        result = await session.exec(
+            select(User).where(User.auth_user_id == UUID(auth_user.id))
+        )
+        user = result.one_or_none()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User profile not found"
+            )
+
+        user.is_activated = True
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user
