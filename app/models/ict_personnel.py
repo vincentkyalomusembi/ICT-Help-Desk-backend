@@ -37,4 +37,4 @@ class IctPersonnel(SQLModel, table=True):
     is_active: bool = Field(default=True)
 
     staff: Optional["User"] = Relationship(back_populates="ict_profile")
-    assigned_tickets: List["Ticket"] = Relationship(back_populates="assignee")
+    assigned_tickets: List["Ticket"] = Relationship(back_populates="assigned_to")
