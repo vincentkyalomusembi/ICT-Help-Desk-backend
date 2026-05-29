@@ -5,7 +5,7 @@ from sqlmodel import select
 from uuid import UUID
 
 from app.db.database import get_session
-from app.core.supabase import supabase as supabase_client
+from app.core.supabase import get_auth_supabase_client
 from app.models import User, UserRole
 
 bearer_scheme = HTTPBearer()
@@ -15,10 +15,11 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     session: AsyncSession = Depends(get_session)
 ) -> User:
+    supabase_client = get_auth_supabase_client()
     if not supabase_client:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Auth service not available"
+            detail="Auth service not available. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY)."
         )
     
     token = credentials.credentials

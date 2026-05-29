@@ -21,6 +21,11 @@
 
 4. Create your `.env` file and ask the team lead / backend lead for the credentials
 
+   Required auth variables:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY` for login and token verification
+   - `SUPABASE_SERVICE_ROLE_KEY` for user registration and admin actions
+
 5. Start the server
 ```bash
    fastapi dev app/main.py
